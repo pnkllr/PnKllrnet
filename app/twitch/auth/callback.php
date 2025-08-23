@@ -77,5 +77,35 @@ $up->execute([$uid, $tw['login'], $access, $refresh, $scope, $expAt]);
 $_SESSION['uid']    = $uid;
 $_SESSION['tlogin'] = $tw['login'];
 
+
+// ---- REMEMBER ME (store hash in users, raw token in cookie) ----
+// Decide when to enable. Options:
+//   a) Always on: $enableRemember = true;
+//   b) From a checkbox on your login form: $enableRemember = !empty($_POST['remember_me']);
+//   c) From query param: $enableRemember = ($_GET['remember'] ?? '') === '1';
+$enableRemember = true; // <- set how you want this to behave
+
+if ($enableRemember) {
+  $rawToken = bin2hex(random_bytes(32));       // 64 hex chars
+  $hash     = hash('sha256', $rawToken);
+  $expires  = date('Y-m-d H:i:s', time() + 30*24*60*60); // 30 days
+
+  $pdo->prepare("
+    UPDATE users
+       SET remember_token_hash = ?, remember_token_expires = ?
+     WHERE id = ?
+  ")->execute([$hash, $expires, $uid]);
+
+  // Set secure, HttpOnly cookie (set secure=false only on localhost if needed)
+  setcookie('remember_me', $rawToken, [
+    'expires'  => time() + 30*24*60*60,
+    'path'     => '/',
+    'secure'   => true,      // requires HTTPS in prod
+    'httponly' => true,
+    'samesite' => 'Lax',
+  ]);
+}
+
+
 header('Location: /dashboard/');
 exit;

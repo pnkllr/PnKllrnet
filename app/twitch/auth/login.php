@@ -8,7 +8,10 @@ $_SESSION['oauth_state'] = $state;
 $scopes = [
   'user:read:email',
   'channel:read:subscriptions',
-  'clips:edit'
+  'clips:edit',
+  'channel:read:goals',
+  'moderator:read:followers',
+  'user:read:emotes'
 ];
 $redirect = rtrim(BASE_URL, '/') . '/twitch/auth/callback.php';
 $params = [

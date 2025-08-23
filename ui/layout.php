@@ -4,7 +4,7 @@ function render_page(string $title, string $content): void { $base = defined('BA
 <title><?= htmlspecialchars($title) ?></title><link rel="stylesheet" href="<?= $base ?>/assets/app.css"></head>
 <body>
 <header class="header"><div class="brand">🛠️ PnKllr.net</div>
-  <nav class="nav"><a href="<?= $base ?>/dashboard/">Dashboard</a><a href="<?= $base ?>/admin/">Admin</a><a href="<?= $base ?>/logout">Logout</a></nav>
+  <nav class="nav"><a class="discord-link" href="https://discord.gg/nth7y8TqMT" target="_blank" rel="noopener">Discord</a><a href="<?= $base ?>/dashboard/">Dashboard</a><a href="<?= $base ?>/admin/">Admin</a><a href="<?= $base ?>/logout.php">Logout</a></nav>
 </header>
 <main class="container"><?= $content ?></main>
 <footer class="container" style="color:#9aa4b2;font-size:13px;padding:20px 0;border-top:1px solid #1f2937;margin-top:20px">
