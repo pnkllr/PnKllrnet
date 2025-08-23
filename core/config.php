@@ -16,3 +16,6 @@ define('DB_PASS', $env('DB_PASS',''));
 
 define('TWITCH_CLIENT_ID',     $env('TWITCH_CLIENT_ID',''));
 define('TWITCH_CLIENT_SECRET', $env('TWITCH_CLIENT_SECRET',''));
+
+$ids = getenv('ADMIN_CHANNEL_IDS') ?: '';
+$GLOBALS['ADMIN_CHANNEL_IDS'] = $ids ? array_map('trim', explode(',', $ids)) : [];

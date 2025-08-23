@@ -1,7 +1,7 @@
 <?php
 // admin/index.php (modern UI)
 require_once __DIR__ . '/../core/bootstrap.php';
-require_login();
+require_admin();
 require_once BASE_PATH . '/ui/layout.php';
 
 $pdo = db();

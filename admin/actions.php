@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/bootstrap.php';
-require_login();
+require_admin();
 
 $action = $_POST['action'] ?? '';
 $id     = (int)($_POST['id'] ?? 0);

@@ -43,4 +43,70 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
     font-size:.9rem;
   }
   .tool-actions{display:flex;gap:8px;flex-wrap:wrap}
+  /* Only affect the permissions badges */
+  .perm-badge {
+    display:inline-block !important;
+    width:auto !important;
+    height:auto !important;
+    padding:2px 8px !important;
+    border-radius:9999px !important;
+    white-space:nowrap !important;
+  }
+/* outer wrapper: block so groups stack */
+.perm-groups { display:block; }
+
+/* each group fills full width and stacks */
+.scope-group { margin:12px 0 16px; }
+
+/* heading style */
+.scope-title { margin:0 0 8px 0; font-weight:600; font-size:18px; }
+
+/* only the badges row is flex */
+.perm-list { display:flex; flex-wrap:wrap; gap:8px; }
+
+/* keep the badge outline behavior */
+.card .perm-badge {
+  display:inline-block !important;
+  width:auto !important;
+  height:auto !important;
+  padding:2px 8px !important;
+  border-radius:9999px !important;
+  white-space:nowrap !important;
+  background:transparent !important;
+  border:1px solid #bbb !important;
+  color:#bbb !important;
+  cursor:pointer; /* 👈 pointer on hover */
+  transition:color .15s, border-color .15s, background .15s;
+}
+
+.card .perm-badge.active {
+  border-color:#22c55e !important;
+  color:#22c55e !important;
+}
+/* All clickable things show pointer */
+.btn,
+button,
+a.btn,
+.card .perm-badge {
+  cursor: pointer !important;
+}
+
+/* Optional: hover feedback for buttons */
+.btn:hover,
+button:hover,
+a.btn:hover {
+  opacity: 0.9;
+}
+
+/* Optional: hover feedback for inactive scope badges */
+.card .perm-badge:hover {
+  border-color: #888 !important;
+  color: #888 !important;
+}
+
+/* (optional) mobile: ensure full-width stacking even if a rogue flex slips in */
+@media (max-width: 860px) {
+  .perm-groups, .scope-group { display:block !important; }
+}
+
   @media (max-width: 900px){ .tool-card{grid-column:span 12} }
