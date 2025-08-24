@@ -20,10 +20,4 @@ return [
   // Health + logout
   'GET /logout'              => ['AuthController','logout'],
   'GET /health'              => ['AuthController','health'],
-
-  // Admin (serves your admin template)
-  'GET /admin'               => ['AdminController','index'],
-
-  // ClipIt tool
-  'GET /tool/clipit'         => ['ToolController','clipit'],
 ];
