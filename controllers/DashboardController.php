@@ -11,7 +11,7 @@ class DashboardController {
     $pdo = DB::pdo();
 
     // user
-    $st = $pdo->prepare("SELECT id, twitch_user_id, display_name, email, avatar_url, twitch_login FROM users WHERE id=?");
+    $st = $pdo->prepare("SELECT id, twitch_user_id, display_name, email, avatar_url FROM users WHERE id=?");
     $st->execute([Auth::userId()]);
     $me = $st->fetch() ?: [];
 
@@ -31,24 +31,20 @@ class DashboardController {
     }
 
     // refresh cached profile (also store login!)
-    $channel_login = '';
     if ($token_bearer) {
       [$u, $uErr] = Twitch::users($token_bearer);
       $ud = $u['data'][0] ?? null;
       if (!$uErr && $ud) {
-        $channel_login = strtolower($ud['login'] ?? '');
-        $upd = $pdo->prepare("UPDATE users SET display_name=?, avatar_url=?, twitch_user_id=?, twitch_login=? WHERE id=?");
+        $upd = $pdo->prepare("UPDATE users SET display_name=?, avatar_url=?, twitch_user_id=? WHERE id=?");
         $upd->execute([
           $ud['display_name'] ?? ($ud['login'] ?? ($me['display_name'] ?? '')),
           $ud['profile_image_url'] ?? ($me['avatar_url'] ?? ''),
           $ud['id'] ?? ($me['twitch_user_id'] ?? null),
-          $channel_login ?: ($me['twitch_login'] ?? null),
           Auth::userId()
         ]);
         $me['display_name']   = $ud['display_name'] ?? $me['display_name'];
         $me['avatar_url']     = $ud['profile_image_url'] ?? $me['avatar_url'];
         $me['twitch_user_id'] = (string)($ud['id'] ?? ($me['twitch_user_id'] ?? ''));
-        $me['twitch_login']   = $channel_login ?: ($me['twitch_login'] ?? '');
       }
     }
 
