@@ -1,4 +1,6 @@
 .env
+
+/app/Config.php
 /storage/*.log
 /storage/cache/
 .DS_Store
