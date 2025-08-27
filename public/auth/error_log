@@ -1,0 +1,15 @@
+[27-Aug-2025 09:37:22 Australia/Sydney] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'field list' in /home2/e8t0t0t7/tools.pnkllr.net/core/Database.php:30
+Stack trace:
+#0 /home2/e8t0t0t7/tools.pnkllr.net/core/Database.php(30): PDO->prepare('SELECT id FROM ...')
+#1 /home2/e8t0t0t7/tools.pnkllr.net/app/Models/User.php(21): Database->query('SELECT id FROM ...', Array)
+#2 /home2/e8t0t0t7/tools.pnkllr.net/app/Controllers/AuthController.php(67): User::setTokens(1, Array, Array)
+#3 /home2/e8t0t0t7/tools.pnkllr.net/public/auth/callback.php(3): AuthController::callback()
+#4 {main}
+  thrown in /home2/e8t0t0t7/tools.pnkllr.net/core/Database.php on line 30
+[27-Aug-2025 09:38:39 Australia/Sydney] PHP Fatal error:  Uncaught RuntimeException: Twitch token error: Invalid authorization code in /home2/e8t0t0t7/tools.pnkllr.net/core/TwitchClient.php:62
+Stack trace:
+#0 /home2/e8t0t0t7/tools.pnkllr.net/core/TwitchClient.php(35): TwitchClient->postToken(Array)
+#1 /home2/e8t0t0t7/tools.pnkllr.net/app/Controllers/AuthController.php(40): TwitchClient->exchangeCode('trozuwedj9y0o10...')
+#2 /home2/e8t0t0t7/tools.pnkllr.net/public/auth/callback.php(3): AuthController::callback()
+#3 {main}
+  thrown in /home2/e8t0t0t7/tools.pnkllr.net/core/TwitchClient.php on line 62

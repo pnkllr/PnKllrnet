@@ -1,20 +1,13 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-error_reporting(E_ALL);
+require_once dirname(__DIR__) . '/core/init.php';
 
-require_once __DIR__.'/../app/bootstrap.php';
-$routes = require __DIR__.'/../routes.php';
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
+$path = rtrim($path, '/');
+if ($path === '') $path = '/';
 
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$key = $method.' '.$path;
-
-if (!isset($routes[$key])) {
-  if ($path === '/' && empty($_SESSION['user_id'])) { view('login'); exit; }
-  http_response_code(404); echo 'Not found'; exit;
+if ($path === '/') {
+    DashboardController::home();
+    exit;
 }
 
-[$class,$func] = $routes[$key];
-require_once __DIR__.'/../controllers/'.$class.'.php';
-$class::$func();
+abort(404);

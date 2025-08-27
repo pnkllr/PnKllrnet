@@ -1,0 +1,17 @@
+RewriteEngine On
+
+# Serve existing files directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route admin to admin.php, rest to index.php
+RewriteRule ^admin($|/.*)$ admin.php [L,QSA]
+RewriteRule ^auth/ - [L]
+RewriteRule ^ index.php [L,QSA]
+
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+RedirectMatch 404 ^/(core|app|config|scripts|sql|vendor)/

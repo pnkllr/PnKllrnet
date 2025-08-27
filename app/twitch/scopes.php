@@ -1,72 +1,82 @@
 <?php
-// app/twitch/scopes.php
+// Master list of Twitch OAuth scopes.
+// Each scope => human-readable description for dashboard UI.
+
 return [
-
   'Clips' => [
-    'clips:edit' => 'Create new clips',
+    'clips:edit' => 'Manage clips. Create clips on your channel.',
   ],
 
-  'Channel (Read)' => [
-    'channel:read:ads'            => 'Read ad schedule',
-    'channel:read:ads_manager'    => 'Read Ads Manager settings',
-    'channel:read:charity'        => 'Read charity activity',
-    'channel:read:editors'        => 'See channel editors',
-    'channel:read:goals'          => 'Read channel goals',
-    'channel:read:hype_train'     => 'Read Hype Train',
-    'channel:read:polls'          => 'Read polls',
-    'channel:read:predictions'    => 'Read predictions',
-    'channel:read:redemptions'    => 'Read Channel Points redemptions',
-    'channel:read:stream_key'     => 'Read stream key',
-    'channel:read:subscriptions'  => 'Read subscribers',
-    'channel:read:vips'           => 'Read VIPs',
+  'Channel Management' => [
+    'channel:edit:commercial'      => 'Run commercials on your channel.',
+    'channel:manage:broadcast'     => 'Update channel title, category, and stream settings.',
+    'channel:manage:extensions'    => 'Manage channel extensions.',
+    'channel:manage:moderators'    => 'Add or remove channel moderators.',
+    'channel:manage:polls'         => 'Manage channel polls.',
+    'channel:manage:predictions'   => 'Manage channel predictions.',
+    'channel:manage:raids'         => 'Manage and cancel raids.',
+    'channel:manage:redemptions'   => 'Manage custom channel points redemptions.',
+    'channel:manage:schedule'      => 'Manage channel stream schedule.',
+    'channel:manage:videos'        => 'Manage (delete) channel videos.',
+    'channel:read:editors'         => 'View a list of channel editors.',
+    'channel:read:goals'           => 'View creator goals.',
+    'channel:read:hype_train'      => 'View Hype Train information.',
+    'channel:read:polls'           => 'View channel polls.',
+    'channel:read:predictions'     => 'View channel predictions.',
+    'channel:read:redemptions'     => 'View custom channel points redemptions.',
+    'channel:read:stream_key'      => 'View your stream key.',
+    'channel:read:subscriptions'   => 'View channel subscriptions (Affiliate/Partner).',
+    'channel:read:vips'            => 'View VIP status.',
+    'channel:manage:vips'          => 'Add or remove channel VIPs.',
   ],
 
-  'Channel (Manage)' => [
-    'channel:manage:ads'          => 'Run ads',
-    'channel:manage:broadcast'    => 'Manage channel broadcast info',
-    'channel:manage:extensions'   => 'Configure channel extensions',
-    'channel:manage:moderators'   => 'Manage moderators',
-    'channel:manage:polls'        => 'Manage polls',
-    'channel:manage:predictions'  => 'Manage predictions',
-    'channel:manage:raids'        => 'Send/Cancel raids',
-    'channel:manage:redemptions'  => 'Manage Channel Points redemptions',
-    'channel:manage:schedule'     => 'Manage stream schedule',
-    'channel:manage:videos'       => 'Manage channel videos',
-    'channel:manage:vips'         => 'Manage VIPs',
-  ],
-
-  'Moderation (Read)' => [
-    'moderator:read:announcements'   => 'Read announcements',
-    'moderator:read:blocked_terms'   => 'Read blocked terms',
-    'moderator:read:chat_settings'   => 'Read chat settings',
-    'moderator:read:chatters'        => 'Read chatters list',
-    'moderator:read:chat_messages'   => 'Read chat messages',
-    'moderator:read:followers'       => 'Read channel followers',
-    'moderator:read:shoutouts'       => 'Read shoutouts',
-    'moderator:read:suspicious_users'=> 'Read suspicious users',
-  ],
-
-  'Moderation (Manage)' => [
-    'moderator:manage:announcements' => 'Send announcements',
-    'moderator:manage:automod'       => 'Manage AutoMod settings',
-    'moderator:manage:blocked_terms' => 'Manage blocked terms',
-    'moderator:manage:banned_users'  => 'Ban/timeout users',
-    'moderator:manage:chat_messages' => 'Delete chat messages',
-    'moderator:manage:chat_settings' => 'Manage chat settings',
-    'moderator:manage:shoutouts'     => 'Send shoutouts',
+  'Moderation' => [
+    'moderation:read'                 => 'View moderation data for a channel.',
+    'moderator:manage:announcements'  => 'Send announcements in chat.',
+    'moderator:manage:automod'        => 'Manage Automod settings.',
+    'moderator:manage:automod_settings' => 'Manage Automod filters.',
+    'moderator:manage:banned_users'   => 'Ban and unban users.',
+    'moderator:read:blocked_terms'    => 'View blocked terms.',
+    'moderator:manage:blocked_terms'  => 'Manage blocked terms.',
+    'moderator:manage:chat_messages'  => 'Delete chat messages.',
+    'moderator:read:chat_settings'    => 'View chat settings.',
+    'moderator:manage:chat_settings'  => 'Manage chat settings.',
+    'moderator:read:chatters'         => 'View list of chatters in channel.',
+    'moderator:read:followers'        => 'View channel followers.',
+    'moderator:read:shield_mode'      => 'View Shield Mode status.',
+    'moderator:manage:shield_mode'    => 'Manage Shield Mode status.',
+    'moderator:read:shoutouts'        => 'View outgoing and incoming shoutouts.',
+    'moderator:manage:shoutouts'      => 'Send shoutouts.',
   ],
 
   'User' => [
-    'user:read:email'           => 'Read verified email',
-    'user:read:broadcast'       => 'Read user’s broadcast settings',
-    'user:read:blocked_users'   => 'Read blocked users',
-    'user:manage:blocked_users' => 'Manage blocked users',
-    'user:manage:chat_color'    => 'Change chat color',
-    'user:edit'                 => 'Edit user description',
-    'user:edit:follows'         => 'Follow/Unfollow channels',
+    'user:edit'             => 'Edit your account description.',
+    'user:edit:broadcast'   => 'Edit your broadcast settings (stream title, category).',
+    'user:edit:follows'     => 'Follow/unfollow channels for you.',
+    'user:manage:blocked_users' => 'Block and unblock other users.',
+    'user:read:blocked_users'   => 'View the block list of your account.',
+    'user:read:broadcast'       => 'View your broadcast settings.',
+    'user:read:email'           => 'View the email address on your account.',
+    'user:read:follows'         => 'View the list of channels you follow.',
+    'user:read:subscriptions'   => 'View your subscriptions to other channels.',
   ],
 
-  'Commerce / Bits' => [
-    'bits:read' => 'Read Bits leaderboard',
+  'Analytics' => [
+    'analytics:read:extensions' => 'View analytics for your extensions.',
+    'analytics:read:games'      => 'View analytics for games you manage.',
+  ],
+
+  'Bits' => [
+    'bits:read' => 'View bits transactions for a channel.',
+  ],
+
+  'Whispers' => [
+    'whispers:read'   => 'Read your whispers.',
+    'whispers:edit'   => 'Send whispers as you.',
+  ],
+
+  'Ads' => [
+    'channel:edit:commercial' => 'Run commercials on your channel.',
+    'channel:manage:ads'      => 'Manage ads scheduling and preferences.',
   ],
 ];
