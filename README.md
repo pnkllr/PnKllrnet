@@ -251,8 +251,7 @@ Background uses a CSS “aurora” with `prefers-reduced-motion` honored.
 
 ## License
 
-Choose a license and add it as `LICENSE` (MIT recommended).  
-If omitted, the default is “All rights reserved”.
+MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
