@@ -1,11 +1,15 @@
 <?php
-require_once __DIR__ . '/../../../core/bootstrap.php';
+// public/tools/clipit.php  — open endpoint (no login required)
+require_once dirname(__DIR__, 2) . '/core/init.php';
 
 // -------- output helpers --------
 $asText = (isset($_GET['format']) && $_GET['format'] === 'text')
        || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'text/plain'));
+
 header('Cache-Control: no-store');
 header('Content-Type: ' . ($asText ? 'text/plain; charset=utf-8' : 'application/json'));
+// Optional: allow calling from anywhere (AJAX etc.); remove if you don't want CORS
+header('Access-Control-Allow-Origin: *');
 
 function out($data, int $code = 200, bool $asText = false) {
   http_response_code($code);
@@ -50,13 +54,19 @@ if ($channel === '' || !preg_match('/^[A-Za-z0-9_]{3,25}$/', $channel)) {
   out(['ok'=>false,'error'=>'Missing or invalid ?channel'], 400, $asText);
 }
 
-// -------- require that channel exists in DB and has a token --------
-$pdo = db();
+// -------- lookup channel + token --------
+$pdo = $GLOBALS['_db']->pdo();
 $sel = $pdo->prepare("
-  SELECT u.id AS uid, u.twitch_id, u.twitch_login,
-         t.id AS tok_id, t.access_token, t.scope, t.expires_at
+  SELECT
+    u.id            AS uid,
+    u.twitch_id     AS twitch_id,
+    u.twitch_login  AS twitch_login,
+    t.access_token  AS access_token,
+    t.scopes        AS scopes,
+    t.expires_at    AS expires_at
   FROM users u
-  LEFT JOIN oauth_tokens t ON t.user_id = u.id AND t.provider = 'twitch'
+  LEFT JOIN oauth_tokens t
+         ON t.user_id = u.id
   WHERE u.twitch_login = ?
   LIMIT 1
 ");
@@ -70,33 +80,38 @@ if (empty($row['access_token'])) {
   out(['ok'=>false,'error'=>'No Twitch token on file for this channel'], 403, $asText);
 }
 
-// Optional: quick expiry hint (no refresh here)
-if (!empty($row['expires_at']) && strtotime($row['expires_at']) <= time()) {
+// token expiry hint (refresh handled by your cron/flow)
+if (!empty($row['expires_at']) && strtotime((string)$row['expires_at']) <= time()) {
   out(['ok'=>false,'error'=>'Token expired; try again after refresh cron or reconnect Twitch'], 401, $asText);
 }
 
-// -------- ensure clips:edit scope was granted --------
-$scopeStr = ' ' . (string)($row['scope'] ?? '') . ' ';
+// ensure the CHANNEL’S token has clips:edit
+$scopeStr = ' ' . (string)($row['scopes'] ?? '') . ' ';
 if (strpos($scopeStr, ' clips:edit ') === false) {
   out(['ok'=>false,'error'=>'clips:edit not granted; please reconnect Twitch with this scope'], 403, $asText);
 }
 
-// -------- throttle per channel --------
+// throttle per channel
 rate_limit($channel, 20);
 
 // -------- create clip --------
-$broadcasterId = $row['twitch_id']; // saved at login
-$url = "https://api.twitch.tv/helix/clips?broadcaster_id=" . urlencode($broadcasterId);
+$broadcasterId = $row['twitch_id'];
+if (!$broadcasterId) {
+  out(['ok'=>false,'error'=>'Missing broadcaster_id for channel'], 500, $asText);
+}
+
+$clientId = defined('TWITCH_CLIENT_ID') ? TWITCH_CLIENT_ID : (getenv('TWITCH_CLIENT_ID') ?: '');
+$url = "https://api.twitch.tv/helix/clips?broadcaster_id=" . urlencode((string)$broadcasterId);
+
 $resp = http_req($url, [
   'method'  => 'POST',
   'headers' => [
     'Authorization: Bearer ' . $row['access_token'],
-    'Client-Id: ' . TWITCH_CLIENT_ID,
+    'Client-Id: ' . $clientId,
   ],
 ]);
 
 if ($resp['status'] === 401) {
-  // No refresh here—cron should handle it
   out(['ok'=>false,'error'=>'Unauthorized (token stale). Wait for cron refresh or reconnect Twitch.','status'=>401], 401, $asText);
 }
 if ($resp['status'] < 200 || $resp['status'] >= 300) {
