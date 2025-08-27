@@ -1,23 +1,27 @@
 <?php
-// Dashboard view with scope picker + reauth flow
+// Dashboard view with scope picker + reauth flow (modernized)
 
 require_once BASE_PATH . '/app/Twitch/helpers.php';
-$allScopes = require BASE_PATH . '/app/Twitch/scopes.php';
+$allScopes = require BASE_PATH . '/app/Twitch/scopes.php'; // case-sensitive fix
 
 /* --- Logged-out users: show connect CTA and stop --- */
 if (!$u) {
 ?>
-  <div class="card">
-    <div class="sectionTitle">Welcome</div>
-    <p class="muted">You’re not connected yet. Connect your Twitch account to view your dashboard.</p>
-    <a class="btn" href="<?= htmlspecialchars(base_url('/auth/twitch.php')) ?>">Connect with Twitch</a>
+  <div class="card hero-card">
+    <div class="hero-left">
+      <div class="hero-title">Welcome</div>
+      <p class="muted">You’re not connected yet. Connect your Twitch account to view your dashboard.</p>
+      <a class="btn ghost" href="<?= htmlspecialchars(base_url('/auth/twitch.php')) ?>">Connect with Twitch</a>
+      <a class="btn ghost" href="<?= htmlspecialchars(base_url('https://discord.gg/nth7y8TqMT')) ?>">Get Support</a>
+    </div>
   </div>
 <?php
   return; // stop rendering the rest of the page when logged out
 }
 
-$uid = (int)$u['id'];
+$uid  = (int)$u['id'];
 $uRow = User::getUser($uid);
+
 /* --- Banned users: show banned card and stop --- */
 if (((int)$uRow['is_banned'] ?? 0) === 1) {
 ?>
@@ -27,7 +31,7 @@ if (((int)$uRow['is_banned'] ?? 0) === 1) {
       Your account has been banned<?= $uRow['banned_at'] ? ' since <strong>' . htmlspecialchars($uRow['banned_at']) . '</strong>' : '' ?>.
     </p>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a class="btn" href="<?= htmlspecialchars(base_url('https://discord.gg/nth7y8TqMT')) ?>">Get Support</a>
+      <a class="btn ghost" href="<?= htmlspecialchars(base_url('https://discord.gg/nth7y8TqMT')) ?>">Get Support</a>
       <a class="btn ghost" href="<?= htmlspecialchars(base_url('/auth/logout.php')) ?>">Log out</a>
     </div>
   </div>
@@ -36,8 +40,8 @@ if (((int)$uRow['is_banned'] ?? 0) === 1) {
 }
 
 $desiredScopes = ScopePrefs::getDesired($uid);
-$tokRow = User::getTokens($uid);
-$activeScopes = $tokRow ? explode(' ', trim($tokRow['scopes'] ?? '')) : [];
+$tokRow        = User::getTokens($uid);
+$activeScopes  = $tokRow ? explode(' ', trim($tokRow['scopes'] ?? '')) : [];
 
 $bearer = '';
 if (!empty($tokRow)) {
@@ -68,9 +72,9 @@ $ttv = function (string $path, array $q = [], ?string $bearer = null): array {
   return $json;
 };
 
-$me = [];
+$me       = [];
 $acctType = null;
-$email = $u['email'] ?? null;
+$email    = $u['email'] ?? null;
 
 if ($bearer) {
   $usersRes = $ttv('/users', [], $bearer);
@@ -78,7 +82,8 @@ if ($bearer) {
   if (!empty($me['email'])) $email = $me['email'];
   $acctType = $me['broadcaster_type'] ?? null;
 }
-$haveScopes = array_flip($activeScopes);
+
+$haveScopes     = array_flip($activeScopes);
 $followersTotal = null;
 $subsTotal      = null;
 
@@ -104,35 +109,49 @@ if ($bearer && isset($haveScopes['channel:read:subscriptions']) && in_array($acc
 }
 ?>
 
-<!-- Profile Information -->
-<div class="card">
-  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+<!-- Hero / Profile -->
+<div class="card hero-card">
+  <div class="hero-main">
     <?php if (!empty($me['profile_image_url'] ?? $u['avatar'])): ?>
-      <img class="avatar" src="<?= htmlspecialchars(($me['profile_image_url'] ?? $u['avatar'])) ?>" alt="">
+      <img class="avatar-xxl" src="<?= htmlspecialchars(($me['profile_image_url'] ?? $u['avatar'])) ?>" alt="">
     <?php endif; ?>
-    <div>
-      <div class="sectionTitle" style="margin:0">
+    <div class="hero-info">
+      <div class="hero-title">
         <?= htmlspecialchars(($me['display_name'] ?? $u['display'] ?? 'Unknown')) ?>
-        <span class="badge">@<?= htmlspecialchars($u['login'] ?? '') ?></span>
+        <span class="badge soft">@<?= htmlspecialchars($u['login'] ?? '') ?></span>
       </div>
       <?php if (!empty($email)): ?>
         <div class="muted"><?= htmlspecialchars($email) ?></div>
       <?php endif; ?>
       <?php if (!empty($u['twitch_id'])): ?>
-        <div class="muted">Twitch ID: <?= htmlspecialchars($u['twitch_id']) ?></div>
+        <div class="muted tiny">Twitch ID: <?= htmlspecialchars($u['twitch_id']) ?></div>
       <?php endif; ?>
     </div>
-    <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span class="badge"><?= htmlspecialchars($acctType ? ucfirst($acctType) : 'Standard') ?></span>
-      <span class="badge">Followers: <?= ($followersTotal !== null ? number_format($followersTotal) : '—') ?></span>
-      <span class="badge">Subs: <?= ($subsTotal !== null ? number_format($subsTotal) : '—') ?></span>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-chip">
+      <div class="stat-label">Account</div>
+      <div class="stat-value"><?= htmlspecialchars($acctType ? ucfirst($acctType) : 'Standard') ?></div>
     </div>
+    <div class="stat-chip">
+      <div class="stat-label">Followers</div>
+      <div class="stat-value"><?= ($followersTotal !== null ? number_format($followersTotal) : '—') ?></div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-label">Subs</div>
+      <div class="stat-value"><?= ($subsTotal !== null ? number_format($subsTotal) : '—') ?></div>
+    </div>
+    <?php if (!empty($activeScopes)): ?>
+      <div class="stat-chip">
+        <div class="stat-label">Scopes</div>
+        <div class="stat-value"><?= count($activeScopes) ?></div>
+      </div>
+    <?php endif; ?>
   </div>
 </div>
-<!-- End Profile Info -->
+<!-- /Hero -->
 
-
-<!-- Token Display -->
 <?php
 // pick which token to show (prefer access, else refresh)
 $tokenType  = '';
@@ -140,10 +159,10 @@ $tokenValue = '';
 $expiresAt  = null;
 if ($tokRow) {
   if (!empty($tokRow['access_token'])) {
-    $tokenType = 'access_token';
+    $tokenType  = 'access_token';
     $tokenValue = (string)$tokRow['access_token'];
   } elseif (!empty($tokRow['refresh_token'])) {
-    $tokenType = 'refresh_token';
+    $tokenType  = 'refresh_token';
     $tokenValue = (string)$tokRow['refresh_token'];
   }
   $expiresAt = $tokRow['expires_at'] ?? null;
@@ -153,27 +172,22 @@ if ($tokRow) {
 $maskMid = function (string $t): string {
   if ($t === '') return '';
   $n = strlen($t);
-  if ($n <= 8) return str_repeat('•', $n); // tiny token, just obfuscate fully
+  if ($n <= 8) return str_repeat('•', $n);
   $first = substr($t, 0, 4);
   $last  = substr($t, -4);
   return $first . str_repeat('•', max(0, $n - 8)) . $last;
 };
 ?>
 
-<div class="card">
+<!-- Token -->
+<div class="card token-card">
   <div class="sectionTitle">Access Token</div>
 
   <?php if (!empty($_GET['token_deleted'])): ?>
-    <p class="muted" style="color:#22c55e;margin:0 0 10px 0">✅ Token deleted.</p>
+    <p class="muted success">✅ Token deleted.</p>
   <?php endif; ?>
 
   <?php if ($tokenValue): ?>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <?php if (!empty($activeScopes)): ?>
-        <span class="badge"><?= count($activeScopes) ?> scope<?= count($activeScopes) === 1 ? '' : 's' ?></span>
-      <?php endif; ?>
-    </div>
-
     <div class="token-line">
       <code id="tok-value"
         class="token-code"
@@ -195,27 +209,26 @@ $maskMid = function (string $t): string {
       <span class="subtle">Expires: <strong><?= $expiresAt ? htmlspecialchars(date('Y-m-d H:i', strtotime($expiresAt))) : '—' ?></strong></span>
     </div>
   <?php else: ?>
-    <p class="muted">No token yet. Use “Permissions” below to select scopes then click “Save &amp; Re‑authorize”.</p>
+    <p class="muted">No token yet. Use “Permissions” below to select scopes then click <em>Save &amp; Re-authorize</em>.</p>
   <?php endif; ?>
 </div>
-<!-- End Token Display -->
+<!-- /Token -->
 
-<!-- Scope selection -->
-<div class="card">
-  <h3 class="sectionTitle">Permissions</h3>
-  <p class="small">
-    Pick the permissions you want your token to have. Click badges to toggle. Then click
-    <em>Save &amp; Re‑authorize</em> to go to Twitch and approve them.
+<!-- Permissions (simple) -->
+<div class="card perms-card" id="scopes">
+  <div class="sectionTitle">Permissions</div>
+  <p class="small muted">
+    Click the scopes you want, then press <em>Save &amp; Re-authorize</em> to grant them on Twitch.
   </p>
 
   <form method="post" action="<?= htmlspecialchars(base_url('/dashboard/scopes.save.php')) ?>">
     <?= CSRF::input() ?>
 
-    <div class="perm-groups" style="display:flex; flex-direction:column; gap:12px">
+    <div class="perm-groups">
       <?php foreach ($allScopes as $group => $groupScopes): ?>
         <section class="scope-group">
-          <h4 style="margin:0 0 8px 0"><?= htmlspecialchars($group) ?></h4>
-          <div class="perm-list" style="display:flex; flex-wrap:wrap; gap:8px">
+          <h4 class="scope-title"><?= htmlspecialchars($group) ?></h4>
+          <div class="perm-list">
             <?php foreach ($groupScopes as $scope => $label):
               $isSelected = in_array($scope, $desiredScopes, true);
               $id = 'sc_' . preg_replace('/[^a-z0-9_]/i', '_', $scope);
@@ -226,12 +239,11 @@ $maskMid = function (string $t): string {
                 id="<?= htmlspecialchars($id) ?>"
                 value="<?= htmlspecialchars($scope) ?>"
                 <?= $isSelected ? 'checked' : '' ?>
-                style="display:none" />
+                class="scope-check" />
               <label
                 for="<?= htmlspecialchars($id) ?>"
                 class="badge perm-badge"
-                title="<?= htmlspecialchars($label) ?>"
-                style="user-select:none; cursor:pointer">
+                title="<?= htmlspecialchars($label) ?>">
                 <?= htmlspecialchars($scope) ?>
               </label>
             <?php endforeach; ?>
@@ -240,75 +252,84 @@ $maskMid = function (string $t): string {
       <?php endforeach; ?>
     </div>
 
-    <div style="margin-top:12px; display:flex; gap:10px; align-items:center">
-      <button class="btn ghost" type="submit">Save &amp; Re‑authorize</button>
-      <span class="small">You’ll be redirected to Twitch to grant the selected scopes.</span>
+    <div class="perms-actions">
+      <button class="btn ghost" type="submit">Save &amp; Re-authorize</button>
+      <span class="small muted">You’ll be redirected to Twitch.</span>
     </div>
   </form>
 </div>
-<!-- Scope End -->
+<!-- Permissions -->
 
 <!-- Tools -->
-<div class="card">
-  <div class="sectionTitle">Tools</div>
+<?php
+require_once BASE_PATH . '/app/ToolsHelper.php';
+$tools         = $tools         ?? (require BASE_PATH . '/app/Tools.php');
+$grantedScopes = $grantedScopes ?? [];
+$hasAll        = $hasAll        ?? fn(array $need, array $have) => count(scopes_missing($need, $have)) === 0;
+$channelLogin  = $u['login'] ?? ($me['login'] ?? '');
+?>
+<div class="card tools-panel">
+  <div class="tools-header">
+    <div class="tools-title">
+      <span>Tools</span>
+    </div>
+    <div class="tools-subtitle">Quick utilities for your channel</div>
+  </div>
+
   <div class="tool-grid">
     <?php foreach ($tools as $t):
       $need     = $t['required_scopes'] ?? [];
-      $enabled  = $hasAll($need, $scopes);
-      $missing  = array_values(array_diff(scopes_normalize($need), scopes_normalize($scopes)));
-      $grantUrl = grant_url($base, $missing, '/dashboard/');
-      $opacity  = $enabled ? '' : 'opacity:.5';
+      $enabled  = $hasAll($need, $grantedScopes);
+      $missing  = scopes_missing($need, $grantedScopes);
+      $rawUrl   = (string)($t['url'] ?? '');
+      $finalUrl = $rawUrl !== '' ? str_replace('{self}', rawurlencode($channelLogin), $rawUrl) : '';
     ?>
-      <article class="tool-card" style="<?= $opacity ?>" aria-disabled="<?= $enabled ? 'false' : 'true' ?>">
-        <div class="tool-top">
-          <div class="tool-name"><?= htmlspecialchars($t['name']) ?></div>
-          <span class="badge"><?= htmlspecialchars($t['method'] ?? 'GET') ?></span>
+      <article class="tool-card" data-enabled="<?= $enabled ? 'true' : 'false' ?>">
+        <header class="tool-head">
+          <div class="tool-id">
+            <div class="tool-meta">
+              <div class="tool-name"><?= htmlspecialchars($t['name']) ?></div>
+              <div class="tool-desc"><?= htmlspecialchars($t['desc'] ?? '') ?></div>
+            </div>
+          </div>
+          <span class="badge method <?= strtolower($t['method'] ?? 'get') ?>"><?= htmlspecialchars($t['method'] ?? 'GET') ?></span>
+        </header>
+
+        <div class="tool-reqs">
+          <span class="req-label">Requires</span>
+          <div class="req-badges">
+            <?php foreach ($need as $ns): ?>
+              <span class="badge scope"><?= htmlspecialchars($ns) ?></span>
+            <?php endforeach; ?>
+          </div>
         </div>
-
-        <p class="subtle"><?= htmlspecialchars($t['desc']) ?></p>
-
-        <p class="subtle">Requires:
-          <?php foreach (($t['required_scopes'] ?? []) as $ns): ?>
-            <span class="badge"><?= htmlspecialchars($ns) ?></span>
-          <?php endforeach; ?>
-        </p>
 
         <?php if ($enabled): ?>
           <div class="tool-url">
-            <code><?= htmlspecialchars($t['url']) ?></code>
-          </div>
-          <div class="tool-actions">
-            <button class="btn"
-              onclick="navigator.clipboard.writeText('<?= htmlspecialchars($t['url']) ?>').then(()=>this.textContent='Copied!')">
-              Copy URL
-            </button>
+            <code class="url-chip" title="<?= htmlspecialchars($finalUrl) ?>">
+              <span class="truncate"><?= htmlspecialchars($finalUrl) ?></span>
+
+              <button
+                type="button"
+                class="chip-action js-copy"
+                data-copy="<?= htmlspecialchars($finalUrl, ENT_QUOTES) ?>"
+                aria-label="Copy URL">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                  <path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14h13a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+                <span>Copy</span>
+              </button>
+            </code>
           </div>
         <?php else: ?>
-          <div class="subtle" title="You don’t currently have these scopes">
-            Missing: <?= htmlspecialchars(implode(', ', $missing) ?: '—') ?>
-          </div>
-          <div class="tool-actions">
-            <a class="btn" href="<?= htmlspecialchars($grantUrl) ?>">Grant required permissions</a>
+          <div class="tool-missing">
+            <span class="badge warn">Missing scopes</span>
+            <span class="missing-list"><?= htmlspecialchars(implode(', ', $missing) ?: '—') ?></span>
+            <span class="hint">Add these in the <a href="#scopes">Permissions</a> section above.</span>
           </div>
         <?php endif; ?>
       </article>
     <?php endforeach; ?>
   </div>
 </div>
-<!-- Tool End -->
-
-
-<style>
-  /* Badge look */
-  .perm-badge {
-    background: transparent !important;
-    border: 1px solid #bbb !important;
-    color: #bbb !important;
-  }
-
-  /* Highlight when the preceding checkbox is checked */
-  input[type="checkbox"]:checked+.perm-badge {
-    border-color: #22c55e !important;
-    color: #22c55e !important;
-  }
-</style>
+<!-- Tools -->
